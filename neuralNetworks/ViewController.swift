@@ -14,49 +14,43 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        setupUI()
-        trainPerceptron()
-        
+    
+        DispatchQueue.global().async {
+            self.trainPerceptron()
+            
+            DispatchQueue.main.async {
+                self.setupUI()
+            }
+        }
     }
     
     func trainPerceptron() {
         
         for _ in 0...5000000 {
             
-            let x = random() % Int(self.view.frame.size.width)
-            let y = random() % Int(self.view.frame.size.height)
-            
-            if y >= 200 {
-                
-                perceptron.train([Float(x),Float(y),Float(1.0)], desired: -1)
-                
-            } else {
-                
-                perceptron.train([Float(x),Float(y),Float(1.0)], desired: 1)
-                
-            }
-            
+            let x = arc4random() % UInt32(view.frame.size.width)
+            let y = arc4random() % UInt32(view.frame.size.height)
+
+            perceptron.train([Float(x),Float(y),Float(1.0)], desired: y >= 200 ? -1 : 1)
         }
-        
     }
     
     func setupUI() {
         
-        let viewTop = UIView(frame: CGRect(x: 0.0, y: 0.0, width: Double(self.view.frame.size.width), height: 200.0))
-        viewTop.backgroundColor = UIColor.redColor()
-        self.view.addSubview(viewTop)
+        let viewTop = UIView(frame: CGRect(x: 0.0, y: 0.0, width: view.frame.width, height: 200.0))
+        viewTop.backgroundColor = .red
+        view.addSubview(viewTop)
         
-        let viewBottom = UIView(frame: CGRect(x: 0.0, y: 200.0, width: Double(self.view.frame.size.width), height: Double(self.view.frame.size.height) - 200.0))
-        viewBottom.backgroundColor = UIColor.blueColor()
-        self.view.addSubview(viewBottom)
+        let viewBottom = UIView(frame: CGRect(x: 0.0, y: 200.0, width: view.frame.width, height: view.frame.height - 200.0))
+        viewBottom.backgroundColor = .blue
+        view.addSubview(viewBottom)
         
     }
 
     
-    override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         
-        if let point = touches.first?.locationInView(self.view) {
+        if let point = touches.first?.location(in: view) {
             
             let result = perceptron.feedForward([Float(point.x), Float(point.y), 1])
             print("\(point.x),\(point.y) \(result)")
@@ -64,12 +58,5 @@ class ViewController: UIViewController {
         }
         
     }
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-
-
 }
 
