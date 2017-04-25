@@ -10,62 +10,21 @@ import UIKit
 
 struct Perceptron {
 
-    var weights: [Float]
+    fileprivate var weights = Array(0...2).map{ _ in Float(arc4random() % 3) - 1 }
     
-    init() {
-        
-        weights = [Float]()
-
-        for _ in 0...2 {
-
-            let randWeight = random() % 3 - 1
-            weights.append(Float(randWeight))
-
-        }
-        
-    }
+    fileprivate func active(_ sum: Float) -> Int { return sum > 0 ? 1 : -1 }
     
-    func active(sum: Float) -> Int {
-        
-        if sum > 0 {
-            
-            return 1
-            
-        } else {
-            
-            return -1
-            
-        }
-        
-    }
+    func feedForward(_ inputs: [Float]) -> Int { return active(Array(0..<weights.count).reduce(0){ return $0 + inputs[$1] * weights[$1] }) }
     
-    func feedForward(inputs: [Float]) -> Int {
-        
-        var sum: Float = 0.0
-        
-        for index in 0..<weights.count {
-
-            sum += inputs[index] * weights[index]
-            
-        }
-        
-        return active(sum)
-        
-    }
+    fileprivate let c:Float = 0.01
     
-    var c:Float = 0.01
-    
-    mutating func train(inputs: [Float], desired: Int) {
+    mutating func train(_ inputs: [Float], desired: Int) {
         
         let guess = feedForward(inputs)
         let error = desired - guess
         
         for index in 0..<weights.count {
-            
             weights[index] += c * Float(error) * inputs[index]
-            
         }
-        
     }
-    
 }
